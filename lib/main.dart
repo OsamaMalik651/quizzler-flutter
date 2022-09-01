@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'quizBrain.dart';
 
 QuizBrain quizBrain = QuizBrain();
@@ -32,24 +33,34 @@ class _QuizPageState extends State<QuizPage> {
 
   void checkAnswer(bool userPickedAnswer) {
     bool correctAnswer = quizBrain.getCorrectAnswer();
-
     setState(() {
-      if (correctAnswer == userPickedAnswer) {
-        scoreKeeper.add(
-          Icon(
-            Icons.check,
-            color: Colors.green,
-          ),
-        );
+      if (quizBrain.isFinished() == true) {
+        Alert(
+                context: context,
+                title: "Quiz Finished",
+                desc: "You \'ve reached the end of the quiz.",
+                type: AlertType.success)
+            .show();
+        quizBrain.reset();
+        scoreKeeper = [];
       } else {
-        scoreKeeper.add(
-          Icon(
-            Icons.close,
-            color: Colors.red,
-          ),
-        );
+        if (correctAnswer == userPickedAnswer) {
+          scoreKeeper.add(
+            Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+          );
+        } else {
+          scoreKeeper.add(
+            Icon(
+              Icons.close,
+              color: Colors.red,
+            ),
+          );
+        }
+        quizBrain.nextQuestion();
       }
-      quizBrain.nextQuestion();
     });
   }
 
@@ -90,7 +101,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked true.
-              checkAnswer(true);
+                checkAnswer(true);
               },
             ),
           ),
